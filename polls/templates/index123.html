@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+    <meta charset="UTF-8">
+    <title>balance query</title>
+</head>
+
+<script>
+    $(document).ready(function(){
+		$("#find").click(function(){
+		var w_address = $("#w_address").val();
+
+		$.get("/polls/send_addr/",{'w_address':w_address}, function(ret){
+			var obj = eval(ret);
+			var tbody=$('<tbody></tbody>');
+			for(var i=0;i<obj.length;i++){
+				var tr=$('<tr></tr>');
+				tr.append('<td>'+ obj[i]['id'] + '</td>' + '<td>'+ obj[i]['name'] + '</td>' +'<td><a href="/delete?id=' + obj[i]['id'] + '" >删除数据</a></td>' );
+				tbody.append(tr);
+			}
+			$('#pstable tbody').replaceWith(tbody);
+        })
+      });
+    });
+//     $(document).ready(function(){
+//         $("#ajax_submit").on("click", function () {
+//             $.ajax({
+//                 url:"/polls/send_addr",
+//                 type:"GET",
+//                 data:{
+//                 "w_address":$("#w_address").val(),
+//                 },  
+//             success: function (data) {
+//                 console.log('data', data)
+//                 console.log('data2', data.view_list)
+//                 // for (var i = data.length - 1; i >= 0; i--) {
+//                 //     // 把 ret 的每一项显示在网页上
+//                 //     $('#list_result').append(' ' + data[i])
+//                 // };
+//             }
+//             })
+//         })
+//   })
+</script>
+
+<body>
+    <div>
+        <input type="text" id="w_address" size="45">
+        <input type="button" value="地址提交" id="ajax_submit">
+        <p class="text"></p>
+    </div>
+    <!-- <form method="post" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+           <label> 上传文件 </label>
+           <input type="file" name="myfile" />
+           <br/>
+           <input type="submit" value="upload"/>
+    </form> -->
+
+    <!-- list show -->
+    <div>
+        <p>查询结果 SHOW ME ---------------------------------------------------------------</p>
+    </div>
+    <div id="result">
+        {% for view in view_list %}
+            {% with view.0 as view0 %} 
+            <h4>holder_address:{{view0.holder_address}}</h1>
+            {% endwith %}
+            {% for u in view %}
+                <h6>blockchain:{{u.blockchain}} | token_symbol:{{u.token_symbol}}
+                    | balance:{{u.balance}} | balance_usd:{{u.balance_usd}}
+                </h6>
+            {% endfor %}    
+        {% endfor %}
+    </div>
+</body>
+</html>

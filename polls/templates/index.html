@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>用户查询页面(nxy)</title>
+</head>
+<body>
+ 
+<form align="center" action="/send_addr/" method="get">
+<div>
+            查询编号： <input type="text" id="w_address" name="w_address" size="45">&nbsp; &nbsp;&nbsp; &nbsp;<button  type="button" id='find'>查询</button>
+                &nbsp; &nbsp;<button  type="button" id='chongzhi' onclick="document.getElementById('id').value=''">重置</button>
+</div>
+</form>
+</br></br>
+<form align="center" method="post" action="/upload" enctype="multipart/form-data">
+    <div>
+        {% csrf_token %}
+        <label for="exampleInputFile">地址列表上传</label>
+         <input  type="file" name="file" id="file_upload">
+         <button  type="button" class="btn btn-default" onclick="FileUpload()">提交</button>
+    </div>
+</form>
+
+</br></br>
+<table class="gridtable" align="center" id="pstable" border="1">
+<thead>
+
+            <tr>
+                <th align=center width=100>blockchain</th>
+                <th align=center width=200>token_symbol</th>
+				<th align=center width=200>balance</th>
+				<th align=center width=200>balance_usd</th>
+				<th align=center width=200>wallet_address</th>
+            </tr>
+
+            <!-- <div id="result">
+                {% for view in view_list %}
+                    {% with view.0 as view0 %} 
+                    <h4>holder_address:{{view0.holder_address}}</h1>
+                    {% endwith %}
+                    {% for u in view %}
+                        <h6>blockchain:{{u.blockchain}} | token_symbol:{{u.token_symbol}}
+                            | balance:{{u.balance}} | balance_usd:{{u.balance_usd}}
+                        </h6>
+                    {% endfor %}    
+                {% endfor %}
+            </div> -->
+</thead>
+ 
+<tbody>
+</tbody>
+</table>
+ 
+ 
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+<script>
+	$(document).ready(function(){
+		$("#find").click(function(){
+		var w_address = $("#w_address").val();
+
+		$.get("/polls/send_addr/",{'w_address':w_address}, function(ret){
+			var obj = eval(ret);
+			var tbody=$('<tbody></tbody>');
+			for(var i=0;i<obj.length;i++){
+				var tr=$('<tr></tr>');
+				tr.append('<td>'+ obj[i]['blockchain'] + '</td>' 
+                        + '<td>'+ obj[i]['token_symbol'] + '</td>' 
+                        + '<td>'+ obj[i]['balance'] + '</td>' 
+                        + '<td>'+ obj[i]['balance_usd'] + '</td>' 
+                        + '<td>'+ obj[i]['holder_address'] + '</td>' 
+                        );
+				tbody.append(tr);
+			}
+			$('#pstable tbody').replaceWith(tbody);
+        })
+      });
+    });
+
+    //   上传附件
+    function FileUpload() {
+            var form_data = new FormData();
+            var file_info = $('#file_upload')[0].files[0];
+            form_data.append('file',file_info);
+            if(file_info==undefined) {
+                alert("你没有选择任何文件");
+                return false;
+            }
+            // 提交ajax的请求
+            $.ajax({
+                url:"/polls/upload/",
+                type:'POST',
+                data: form_data,
+                processData: false,  // tell jquery not to process the data
+                contentType: false, // tell jquery not to set contentType
+                success: function(ret) {
+                    ret = eval(ret)
+                    var tbody=$('<tbody></tbody>');
+                    for(var i=0;i<ret.length;i++){
+                        for (var j=0;j<ret[i].length;j++) {
+                            var tr=$('<tr></tr>');
+                            tr.append('<td>'+ ret[i][j]['blockchain'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['token_symbol'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['balance'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['balance_usd'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['holder_address'] + '</td>' 
+                                    );
+                            tbody.append(tr);
+                        }
+                    }
+                    $('#pstable tbody').replaceWith(tbody);
+                }
+            }); // end ajax
+        }
+
+</script>
+ 
+</body>
+</html>
+ 
+<style type="text/css">
+  table.gridtable {
+      font-family: verdana,arial,sans-serif;
+      font-size:11px;
+      color:#333333;
+      border-width: 1px;
+      border-color: #666666;
+      border-collapse: collapse;
+ }
+ table.gridtable th {
+     border-width: 1px;
+     padding: 8px;
+     border-style: solid;
+     border-color: #666666;
+     background-color: #dedede;
+ }
+ table.gridtable td {
+     border-width: 1px;
+     padding: 8px;
+     border-style: solid;
+     border-color: #666666;
+     background-color: #ffffff;
+ }
+ </style>
