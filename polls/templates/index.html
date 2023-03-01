@@ -1,36 +1,40 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>用户查询页面(nxy)</title>
-</head>
-<body>
- 
-<form align="center" action="/send_addr/" method="get">
-<div>
-            查询编号： <input type="text" id="w_address" name="w_address" size="45">&nbsp; &nbsp;&nbsp; &nbsp;<button  type="button" id='find'>查询</button>
-                &nbsp; &nbsp;<button  type="button" id='chongzhi' onclick="document.getElementById('id').value=''">重置</button>
-</div>
-</form>
-</br></br>
-<form align="center" method="post" action="/upload" enctype="multipart/form-data">
-    <div>
-        {% csrf_token %}
-        <label for="exampleInputFile">地址列表上传</label>
-         <input  type="file" name="file" id="file_upload">
-         <button  type="button" class="btn btn-default" onclick="FileUpload()">提交</button>
-    </div>
-</form>
 
-</br></br>
-<table class="gridtable" align="center" id="pstable" border="1">
-<thead>
+<head>
+    <title>用户查询页面(nxy)</title>
+</head>
+
+<body>
+
+    <form align="center" action="/send_addr/" method="get">
+        <div>
+            查询单地址： <input type="text" id="w_address" name="w_address" size="45">&nbsp; &nbsp;&nbsp; &nbsp;<button
+                type="button" id='find'>查询</button>
+            &nbsp; &nbsp;<button type="button" id='chongzhi'
+                onclick="document.getElementById('id').value=''">重置</button>
+        </div>
+    </form>
+    </br></br>
+    <form align="center" method="post" action="/upload" enctype="multipart/form-data">
+        <div>
+            {% csrf_token %}
+            <label for="exampleInputFile">地址列表上传</label>
+            <input type="file" name="file" id="file_upload">
+            <button type="button" class="btn btn-default" onclick="FileUpload()">提交</button>
+        </div>
+    </form>
+
+    </br></br>
+    <table class="gridtable" align="center" id="pstable" border="1">
+        <thead>
 
             <tr>
-                <th align=center width=100>blockchain</th>
-                <th align=center width=200>token_symbol</th>
-				<th align=center width=200>balance</th>
-				<th align=center width=200>balance_usd</th>
-				<th align=center width=200>wallet_address</th>
+                <th align=center width=100>钱包地址</th>
+                <th align=center width=120>总余额USD</th>
+                <th align=center width=120>总余额ETH</th>
+                <th align=center width=650>链上余额</th>
+                <th align=center width=80>链上代币详情</th>
             </tr>
 
             <!-- <div id="result">
@@ -45,99 +49,204 @@
                     {% endfor %}    
                 {% endfor %}
             </div> -->
-</thead>
- 
-<tbody>
-</tbody>
-</table>
- 
- 
-<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
-<script>
-	$(document).ready(function(){
-		$("#find").click(function(){
-		var w_address = $("#w_address").val();
+        </thead>
 
-		$.get("/polls/send_addr/",{'w_address':w_address}, function(ret){
-			var obj = eval(ret);
-			var tbody=$('<tbody></tbody>');
-			for(var i=0;i<obj.length;i++){
-				var tr=$('<tr></tr>');
-				tr.append('<td>'+ obj[i]['blockchain'] + '</td>' 
-                        + '<td>'+ obj[i]['token_symbol'] + '</td>' 
-                        + '<td>'+ obj[i]['balance'] + '</td>' 
-                        + '<td>'+ obj[i]['balance_usd'] + '</td>' 
-                        + '<td>'+ obj[i]['holder_address'] + '</td>' 
-                        );
-				tbody.append(tr);
-			}
-			$('#pstable tbody').replaceWith(tbody);
-        })
-      });
-    });
+        <tbody>
+            <!-- <tr>
+                <td>0x5C0Cb2532F10e9Dc2752215663f26D97598A85d2</td>
+                <td align=center>100.02</td>
+                <td align=center>0.00801</td>
+                <td>
+                    <div>
+                        <img src=https://www.ankr.com/rpc/static/media/optimism.53b7f574.svg
+                            style="display:inline-block;width: 30px;height: 100%;" title="optimism">
+                        <span>optimism[$1.03]20%</span>
+                    </div>
+                </td>
+                <td><a href="https://debank.com" target="_blank">更多....</a></td>
+            </tr> -->
+        </tbody>
+    </table>
 
-    //   上传附件
-    function FileUpload() {
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script>
+        function dot() {   //等待框动画
+            dot_number = 0;
+            var a = function () {
+                if (dot_number < 3) {
+                    $waitdiv.append("<span>.</span");
+                    dot_number++;
+                } else {
+                    $waitdiv.children("span").remove();
+                    dot_number = 0;
+                }
+            }
+            var mytime = setInterval(a, 500);
+            $waitdiv.attr("time", mytime);
+        }
+
+        function clickMovie() {
+            $newDiv = $("<div id='cover_div'></div>"); //页面覆盖层，不让用户操作
+            $('body').append($newDiv);
+            $('body').append($newDiv);
+            $coverDiv = $("#cover_div");
+            width = $(document).width();
+            height = $(document).height();
+            $coverDiv.css('height', height);
+            $coverDiv.css('width', width);
+            //alert($coverDiv.width())
+            $coverDiv.css('position', 'absolute');
+            $coverDiv.css("left", "0px");
+            $coverDiv.css("top", "0px");
+            $coverDiv.css('background-color', 'lightcyan');
+            $coverDiv.css('opacity', 0.5);
+            $newDiv = $("<div id='wait'>查询中，请等待</br></div>");  //等待框
+            $('body').append($newDiv);
+            $waitdiv = $("#wait");
+            $waitdiv.css("margin", "0 auto");
+            $waitdiv.css("position", "absolute");
+            $waitdiv.css("text-align:", "center");
+            $waitdiv.css("padding", "5px");
+            $waitdiv.css("height", "50px");
+            $waitdiv.css("width", "150px");
+            $waitdiv.css("border-style", "solid");
+            $waitdiv.css("border-color", "blue");
+            $waitdiv.css("left", "600px");
+            $waitdiv.css("top", "80px");
+            $waitdiv.css("background-color", "lavender");
+            dot();
+        }
+
+        $(document).ready(function() {
+            $("#find").click(function () {
+                if ($("#w_address").val() == '') {
+                    return false;
+                }
+                clickMovie();
+
+                var w_address = $("#w_address").val();
+
+                $.get("/polls/send_addr/", { 'w_address': w_address }, function (ret) {
+                    if (ret != null) {
+                        $("body").children("#wait").remove(); //清除覆盖层
+                        $("body").children("#cover_div").remove();
+                    }
+                    var obj = JSON.parse(ret)
+                    console.log(obj.holder_address)
+
+                    var tbody = $('<tbody></tbody>');
+                    var tr = $('<tr></tr>');
+                    tr.append('<td>' + obj['holder_address'] + '</td>');
+                    tr.append('<td>' + obj['total_usd'] + '</td>');
+                    tr.append('<td>' + obj['total_eth'] + '</td>');
+                    chain_balance = $('<td><div></div></td>');
+                    var chain_acount = '';
+                    var rec = obj['rec'];
+                    for (var i = 0; i < rec.length; i++) {
+                        if (rec[i].balance_usd != '0.0') {
+                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['thumbnail'] + '">'
+                                + '<span>' + rec[i]['token_symbol'] + '[$' + rec[i].balance_usd + ']' + rec[i].percent + '%</span>'
+                        } else {
+                            var count = rec[i].balance.substring(0,rec[i].balance.indexOf(".")+5);
+                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['thumbnail'] + '">'
+                                + '<span>' + rec[i]['token_symbol'] + '[' + count + ']' + '0.0%</span>'
+                        }
+                    }
+                    chain_balance.append(chain_acount);
+                    tr.append(chain_balance);
+                    tr.append('<td><a href="https://debank.com/profile/' + obj['holder_address'] + '" target="_blank">更多....</a></td>');
+                    tbody.append(tr);
+
+                    $('#pstable tbody').replaceWith(tbody);
+                }).fail(function (xhr, errorText, errorType) {
+                    $("body").children("#wait").remove(); //清除覆盖层  
+                    $("body").children("#cover_div").remove();
+                });
+            });
+        });
+
+        //   上传附件
+        function FileUpload() {
             var form_data = new FormData();
             var file_info = $('#file_upload')[0].files[0];
-            form_data.append('file',file_info);
-            if(file_info==undefined) {
+            form_data.append('file', file_info);
+            if (file_info == undefined || file_info == '') {
                 alert("你没有选择任何文件");
                 return false;
             }
+            clickMovie();
             // 提交ajax的请求
             $.ajax({
-                url:"/polls/upload/",
-                type:'POST',
+                url: "/polls/upload/",
+                type: 'POST',
                 data: form_data,
                 processData: false,  // tell jquery not to process the data
                 contentType: false, // tell jquery not to set contentType
-                success: function(ret) {
-                    ret = eval(ret)
-                    var tbody=$('<tbody></tbody>');
-                    for(var i=0;i<ret.length;i++){
-                        for (var j=0;j<ret[i].length;j++) {
-                            var tr=$('<tr></tr>');
-                            tr.append('<td>'+ ret[i][j]['blockchain'] + '</td>' 
-                                    + '<td>'+ ret[i][j]['token_symbol'] + '</td>' 
-                                    + '<td>'+ ret[i][j]['balance'] + '</td>' 
-                                    + '<td>'+ ret[i][j]['balance_usd'] + '</td>' 
-                                    + '<td>'+ ret[i][j]['holder_address'] + '</td>' 
-                                    );
+                success: function (ret) {
+                    if (ret != null && ret != '') {
+                        $("body").children("#wait").remove(); //清除覆盖层
+                        $("body").children("#cover_div").remove();
+                    }
+                    var obj = JSON.parse(ret)
+                    var tbody = $('<tbody></tbody>');
+                    for (var i in obj) {
+                        reb = obj[i]
+                            var tr = $('<tr></tr>');
+                            tr.append('<td>' + reb.holder_address + '</td>');
+                            tr.append('<td>' + reb.total_usd + '</td>');
+                            tr.append('<td>' + reb.total_eth + '</td>');
+                            chain_balance = $('<td><div></div></td>');
+                            var chain_acount = '';
+                            rec = eval(reb.rec)
+                            for(var i in rec) {
+                                if (rec[i].balance_usd != '0.0') {
+                                    chain_acount += '<img src="' + rec[i].thumbnail + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i].thumbnail + '">'
+                                        + '<span>' + rec[i].token_symbol + '[$' + rec[i].balance_usd + ']' + rec[i].percent + '%</span>'
+                                } else {
+                                    var count = rec[i].balance.substring(0,rec[i].balance.indexOf(".")+5);
+                                    chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['thumbnail'] + '">'
+                                        + '<span>' + rec[i]['token_symbol'] + '[' + count + ']' + '0.0%</span>'
+                                }
+                            }
+                            chain_balance.append(chain_acount);
+                            tr.append(chain_balance);
+                            tr.append('<td><a href="https://debank.com/profile/' + reb['holder_address'] + '" target="_blank">更多....</a></td>');
                             tbody.append(tr);
-                        }
                     }
                     $('#pstable tbody').replaceWith(tbody);
                 }
             }); // end ajax
         }
 
-</script>
- 
+    </script>
+
 </body>
+
 </html>
- 
+
 <style type="text/css">
-  table.gridtable {
-      font-family: verdana,arial,sans-serif;
-      font-size:11px;
-      color:#333333;
-      border-width: 1px;
-      border-color: #666666;
-      border-collapse: collapse;
- }
- table.gridtable th {
-     border-width: 1px;
-     padding: 8px;
-     border-style: solid;
-     border-color: #666666;
-     background-color: #dedede;
- }
- table.gridtable td {
-     border-width: 1px;
-     padding: 8px;
-     border-style: solid;
-     border-color: #666666;
-     background-color: #ffffff;
- }
- </style>
+    table.gridtable {
+        font-family: verdana, arial, sans-serif;
+        font-size: 8px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+
+    table.gridtable th {
+        border-width: 1px;
+        padding: 2px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #dedede;
+    }
+
+    table.gridtable td {
+        border-width: 1px;
+        padding: 2px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+</style>
