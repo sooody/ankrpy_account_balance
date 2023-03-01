@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>用户查询页面(nxy)</title>
+    <title>用户查询页面(niaoge)</title>
 </head>
 
 <body>
@@ -144,11 +144,11 @@
                     var rec = obj['rec'];
                     for (var i = 0; i < rec.length; i++) {
                         if (rec[i].balance_usd != '0.0') {
-                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['thumbnail'] + '">'
+                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['blockchain'] + '">'
                                 + '<span>' + rec[i]['token_symbol'] + '[$' + rec[i].balance_usd + ']' + rec[i].percent + '%</span>'
                         } else {
                             var count = rec[i].balance.substring(0,rec[i].balance.indexOf(".")+5);
-                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['thumbnail'] + '">'
+                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['blockchain'] + '">'
                                 + '<span>' + rec[i]['token_symbol'] + '[' + count + ']' + '0.0%</span>'
                         }
                     }
@@ -200,11 +200,11 @@
                             rec = eval(reb.rec)
                             for(var i in rec) {
                                 if (rec[i].balance_usd != '0.0') {
-                                    chain_acount += '<img src="' + rec[i].thumbnail + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i].thumbnail + '">'
+                                    chain_acount += '<img src="' + rec[i].thumbnail + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i].blockchain + '">'
                                         + '<span>' + rec[i].token_symbol + '[$' + rec[i].balance_usd + ']' + rec[i].percent + '%</span>'
                                 } else {
                                     var count = rec[i].balance.substring(0,rec[i].balance.indexOf(".")+5);
-                                    chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['thumbnail'] + '">'
+                                    chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['blockchain'] + '">'
                                         + '<span>' + rec[i]['token_symbol'] + '[' + count + ']' + '0.0%</span>'
                                 }
                             }
