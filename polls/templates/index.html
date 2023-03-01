@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>多链查询(niaoge)</title>
+	<title>用户查询页面(nxy)</title>
 </head>
 
 <body>
@@ -126,44 +126,23 @@
 
                 var w_address = $("#w_address").val();
 
-                $.get("/polls/send_addr/", { 'w_address': w_address }, function (ret) {
-                    if (ret != null) {
-                        $("body").children("#wait").remove(); //清除覆盖层
-                        $("body").children("#cover_div").remove();
-                    }
-                    var obj = JSON.parse(ret)
-                    console.log(obj.holder_address)
-
-                    var tbody = $('<tbody></tbody>');
-                    var tr = $('<tr></tr>');
-                    tr.append('<td>' + obj['holder_address'] + '</td>');
-                    tr.append('<td>' + obj['total_usd'] + '</td>');
-                    tr.append('<td>' + obj['total_eth'] + '</td>');
-                    chain_balance = $('<td><div></div></td>');
-                    var chain_acount = '';
-                    var rec = obj['rec'];
-                    for (var i = 0; i < rec.length; i++) {
-                        if (rec[i].balance_usd != '0.0') {
-                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['blockchain'] + '">'
-                                + '<span>' + rec[i]['token_symbol'] + '[$' + rec[i].balance_usd + ']' + rec[i].percent + '%</span>'
-                        } else {
-                            var count = rec[i].balance.substring(0,rec[i].balance.indexOf(".")+5);
-                            chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['blockchain'] + '">'
-                                + '<span>' + rec[i]['token_symbol'] + '[' + count + ']' + '0.0%</span>'
-                        }
-                    }
-                    chain_balance.append(chain_acount);
-                    tr.append(chain_balance);
-                    tr.append('<td><a href="https://debank.com/profile/' + obj['holder_address'] + '" target="_blank">更多....</a></td>');
-                    tbody.append(tr);
-
-                    $('#pstable tbody').replaceWith(tbody);
-                }).fail(function (xhr, errorText, errorType) {
-                    $("body").children("#wait").remove(); //清除覆盖层  
-                    $("body").children("#cover_div").remove();
-                });
-            });
-        });
+		$.get("/polls/send_addr/",{'w_address':w_address}, function(ret){
+			var obj = eval(ret);
+			var tbody=$('<tbody></tbody>');
+			for(var i=0;i<obj.length;i++){
+				var tr=$('<tr></tr>');
+				tr.append('<td>'+ obj[i]['blockchain'] + '</td>' 
+                        + '<td>'+ obj[i]['token_symbol'] + '</td>' 
+                        + '<td>'+ obj[i]['balance'] + '</td>' 
+                        + '<td>'+ obj[i]['balance_usd'] + '</td>' 
+                        + '<td>'+ obj[i]['holder_address'] + '</td>' 
+                        );
+				tbody.append(tr);
+			}
+			$('#pstable tbody').replaceWith(tbody);
+        })
+      });
+    });
 
         //   上传附件
         function FileUpload() {
@@ -182,38 +161,22 @@
                 data: form_data,
                 processData: false,  // tell jquery not to process the data
                 contentType: false, // tell jquery not to set contentType
-                success: function (ret) {
-                    if (ret != null && ret != '') {
-                        $("body").children("#wait").remove(); //清除覆盖层
-                        $("body").children("#cover_div").remove();
-                    }
-                    var obj = JSON.parse(ret)
-                    var tbody = $('<tbody></tbody>');
-                    for (var i in obj) {
-                        reb = obj[i]
-                            var tr = $('<tr></tr>');
-                            tr.append('<td>' + reb.holder_address + '</td>');
-                            tr.append('<td>' + reb.total_usd + '</td>');
-                            tr.append('<td>' + reb.total_eth + '</td>');
-                            chain_balance = $('<td><div></div></td>');
-                            var chain_acount = '';
-                            rec = eval(reb.rec)
-                            for(var i in rec) {
-                                if (rec[i].balance_usd != '0.0') {
-                                    chain_acount += '<img src="' + rec[i].thumbnail + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i].blockchain + '">'
-                                        + '<span>' + rec[i].token_symbol + '[$' + rec[i].balance_usd + ']' + rec[i].percent + '%</span>'
-                                } else {
-                                    var count = rec[i].balance.substring(0,rec[i].balance.indexOf(".")+5);
-                                    chain_acount += '<img src="' + rec[i]['thumbnail'] + '" style="display:inline-block;width: 30px;height: 100%;" title="' + rec[i]['blockchain'] + '">'
-                                        + '<span>' + rec[i]['token_symbol'] + '[' + count + ']' + '0.0%</span>'
-                                }
-                            }
-                            chain_balance.append(chain_acount);
-                            tr.append(chain_balance);
-                            tr.append('<td><a href="https://debank.com/profile/' + reb['holder_address'] + '" target="_blank">更多....</a></td>');
+                success: function(ret) {
+                    ret = eval(ret)
+                    var tbody=$('<tbody></tbody>');
+                    for(var i=0;i<ret.length;i++){
+                        for (var j=0;j<ret[i].length;j++) {
+                            var tr=$('<tr></tr>');
+                            tr.append('<td>'+ ret[i][j]['blockchain'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['token_symbol'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['balance'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['balance_usd'] + '</td>' 
+                                    + '<td>'+ ret[i][j]['holder_address'] + '</td>' 
+                                    );
                             tbody.append(tr);
-                    }
-                    $('#pstable tbody').replaceWith(tbody);
+                        }
+                        
+                    }$('#pstable tbody').replaceWith(tbody);
                 }
             }); // end ajax
         }
@@ -225,28 +188,26 @@
 </html>
 
 <style type="text/css">
-    table.gridtable {
-        font-family: verdana, arial, sans-serif;
-        font-size: 8px;
-        color: #333333;
-        border-width: 1px;
-        border-color: #666666;
-        border-collapse: collapse;
-    }
-
-    table.gridtable th {
-        border-width: 1px;
-        padding: 2px;
-        border-style: solid;
-        border-color: #666666;
-        background-color: #dedede;
-    }
-
-    table.gridtable td {
-        border-width: 1px;
-        padding: 2px;
-        border-style: solid;
-        border-color: #666666;
-        background-color: #ffffff;
-    }
-</style>
+  table.gridtable {
+      font-family: verdana,arial,sans-serif;
+      font-size:11px;
+      color:#333333;
+      border-width: 1px;
+      border-color: #666666;
+      border-collapse: collapse;
+ }
+ table.gridtable th {
+     border-width: 1px;
+     padding: 8px;
+     border-style: solid;
+     border-color: #666666;
+     background-color: #dedede;
+ }
+ table.gridtable td {
+     border-width: 1px;
+     padding: 8px;
+     border-style: solid;
+     border-color: #666666;
+     background-color: #ffffff;
+ }
+ </style>
